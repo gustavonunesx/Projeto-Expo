@@ -1,0 +1,22 @@
+# Ignorar node_modules em mobile-app
+mobile-app/node_modules/
+mobile-app/package-lock.json
+
+# Outros arquivos/diretórios comuns em projetos Expo
+mobile-app/.expo/
+mobile-app/dist/
+mobile-app/build/
+mobile-app/assets/*.png.liquid
+mobile-app/*.log
+mobile-app/npm-debug.log
+mobile-app/yarn-error.log
+mobile-app/.DS_Store
+
+# Ignorar arquivos de configuração sensíveis (se houver)
+mobile-app/.env
+mobile-app/.env.local
+mobile-app/.env.*.local
+
+# Ignorar arquivos de build e cache
+mobile-app/__generated__/
+mobile-app/.cache/
