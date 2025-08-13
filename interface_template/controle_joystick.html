@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Controle Multifuncional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        touch-action: none;
+      }
+      .control-container {
+        display: none; /* Esconde todos os containers de controle por padrão */
+        width: 100%;
+      }
+      .control-container.active {
+        display: flex; /* Mostra apenas o container ativo */
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #joystick-container::after {
+        content: "";
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        z-index: 0;
+      }
+      .arrow {
+        position: absolute;
+        color: #4a5568;
+        width: 1.5rem;
+        height: 1.5rem;
+        pointer-events: none;
+      }
+      /* Estilos para o Modal de Configurações */
+      #settings-modal {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      .modal-content {
+        transition: transform 0.3s ease;
+      }
+      /* Estilos para Botões Direcionais */
+      .d-pad-button {
+        transition: background-color 0.1s ease, transform 0.1s ease;
+      }
+      .d-pad-button:active {
+        transform: scale(0.95);
+        background-color: #4a5568;
+      }
+      /* Estilos para o Volante */
+      #steering-wheel-svg {
+        transition: transform 0.1s linear;
+      }
+      .pedal {
+        transition: transform 0.1s ease, box-shadow 0.1s ease;
+      }
+      .pedal.pressed {
+        transform: translateY(4px) scale(0.98);
+        box-shadow: none;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden relative"
+  >
+    <!-- Ícone de Configurações -->
+    <div
+      id="settings-button"
+      class="absolute top-4 right-4 cursor-pointer p-2 rounded-full hover:bg-gray-700 transition-colors z-20"
+    >
+      <svg
+        class="w-8 h-8 text-gray-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+        />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div
+      id="settings-modal"
+      class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 opacity-0 pointer-events-none"
+    >
+      <div
+        class="modal-content bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm border border-gray-700 transform scale-95"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-blue-400">Tipo de Controle</h2>
+          <button
+            id="close-modal-button"
+            class="p-1 rounded-full hover:bg-gray-700 transition-colors"
+          >
+            <svg
+              class="w-6 h-6 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 gap-4">
+          <button
+            data-control="joystick"
+            class="control-choice-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-5 rounded-lg transition-transform transform hover:scale-105"
+          >
+            Joystick Analógico
+          </button>
+          <button
+            data-control="buttons"
+            class="control-choice-button bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-5 rounded-lg transition-transform transform hover:scale-105"
+          >
+            Botões Direcionais
+          </button>
+          <button
+            data-control="wheel"
+            class="control-choice-button bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-5 rounded-lg transition-transform transform hover:scale-105"
+          >
+            Volante e Pedais
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container para o Joystick -->
+    <div id="joystick-control" class="control-container active">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-400">
+          Controle Joystick
+        </h1>
+        <p class="text-gray-400 mt-2">Arraste o círculo para controlar.</p>
+      </div>
+      <div
+        id="joystick-container"
+        class="w-56 h-56 md:w-64 md:h-64 bg-gray-800 rounded-full flex items-center justify-center relative shadow-2xl border-4 border-gray-700"
+      >
+        <div class="arrow top-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"
+            />
+          </svg>
+        </div>
+        <div class="arrow bottom-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"
+            />
+          </svg>
+        </div>
+        <div class="arrow left-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+            />
+          </svg>
+        </div>
+        <div class="arrow right-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+            />
+          </svg>
+        </div>
+        <div
+          id="joystick-stick"
+          class="w-20 h-20 md:w-24 md:h-24 bg-blue-500 rounded-full absolute cursor-grab shadow-lg border-4 border-blue-400 z-10 transition-transform duration-100 ease-linear"
+        ></div>
+      </div>
+      <div
+        class="mt-8 p-4 bg-gray-800 rounded-xl shadow-lg w-full max-w-xs text-center border border-gray-700"
+      >
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm font-semibold text-blue-300">EIXO X / Y</p>
+            <p id="position-text" class="text-lg font-mono font-bold mt-1">
+              (0, 0)
+            </p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-blue-300">FORÇA</p>
+            <p id="strength-text" class="text-lg font-mono font-bold mt-1">
+              0%
+            </p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm font-semibold text-blue-300">DIREÇÃO</p>
+          <p
+            id="direction-text"
+            class="text-lg font-mono font-bold mt-1 uppercase"
+          >
+            Parado
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container para os Botões -->
+    <div id="buttons-control" class="control-container">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-400">
+          Controle por Botões
+        </h1>
+        <p class="text-gray-400 mt-2">Pressione os botões.</p>
+      </div>
+      <div class="grid grid-cols-3 grid-rows-3 w-56 h-56 md:w-64 md:h-64">
+        <div class="col-start-2 flex items-center justify-center">
+          <button
+            id="btn-up"
+            class="d-pad-button w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center"
+          >
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="col-start-1 row-start-2 flex items-center justify-center">
+          <button
+            id="btn-left"
+            class="d-pad-button w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center"
+          >
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="col-start-3 row-start-2 flex items-center justify-center">
+          <button
+            id="btn-right"
+            class="d-pad-button w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center"
+          >
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="col-start-2 row-start-3 flex items-center justify-center">
+          <button
+            id="btn-down"
+            class="d-pad-button w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center"
+          >
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div
+        class="mt-8 p-4 bg-gray-800 rounded-xl shadow-lg w-full max-w-xs text-center border border-gray-700"
+      >
+        <p class="text-sm font-semibold text-blue-300">DIREÇÃO</p>
+        <p
+          id="buttons-direction-text"
+          class="text-lg font-mono font-bold mt-1 uppercase"
+        >
+          PARADO
+        </p>
+      </div>
+    </div>
+
+    <!-- Container para o Volante (NOVO DESIGN) -->
+    <div id="wheel-control" class="control-container">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-400">
+          Controle por Volante
+        </h1>
+        <p class="text-gray-400 mt-2">Gire o volante e use os pedais.</p>
+      </div>
+      <div
+        id="steering-wheel-container"
+        class="mb-8 cursor-grabbing flex items-center justify-center w-64 h-64"
+      >
+        <svg
+          id="steering-wheel-svg"
+          class="w-full h-full"
+          viewBox="0 0 100 100"
+        >
+          <!-- Aro do volante -->
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            stroke="#374151"
+            stroke-width="10"
+            fill="none"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            stroke="#4f46e5"
+            stroke-width="2"
+            fill="none"
+            stroke-dasharray="4 8"
+          />
+          <!-- Raios do volante -->
+          <g stroke="#4A5568" stroke-width="8" stroke-linecap="round">
+            <path d="M50 50 L 50 12" />
+            <path d="M50 50 L 15 78" />
+            <path d="M50 50 L 85 78" />
+          </g>
+          <!-- Centro do volante -->
+          <circle cx="50" cy="50" r="18" fill="#1F2937" />
+          <circle cx="50" cy="50" r="12" fill="#4f46e5" />
+        </svg>
+      </div>
+      <div class="flex gap-6">
+        <button
+          id="brake-pedal"
+          class="pedal flex flex-col items-center gap-2 bg-gray-800 border-2 border-red-500/50 text-red-400 font-semibold py-3 px-8 rounded-lg shadow-lg shadow-red-500/10"
+        >
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>Frear</span>
+        </button>
+        <button
+          id="accelerator-pedal"
+          class="pedal flex flex-col items-center gap-2 bg-gray-800 border-2 border-green-500/50 text-green-400 font-semibold py-3 px-8 rounded-lg shadow-lg shadow-green-500/10"
+        >
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 6a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM10 12a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zM4 16a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+            />
+          </svg>
+          <span>Acelerar</span>
+        </button>
+      </div>
+      <div
+        class="mt-8 p-4 bg-gray-800 rounded-xl shadow-lg w-full max-w-sm text-center border border-gray-700 flex justify-around"
+      >
+        <div>
+          <p class="text-sm font-semibold text-blue-300">ÂNGULO</p>
+          <p id="wheel-angle-text" class="text-xl font-mono font-bold mt-1">
+            0°
+          </p>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-blue-300">PEDAIS</p>
+          <p
+            id="pedal-status-text"
+            class="text-xl font-mono font-bold mt-1 uppercase"
+          >
+            PARADO
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- LÓGICA DO MODAL DE CONFIGURAÇÕES ---
+      const settingsButton = document.getElementById("settings-button");
+      const closeModalButton = document.getElementById("close-modal-button");
+      const settingsModal = document.getElementById("settings-modal");
+      const modalContent = settingsModal.querySelector(".modal-content");
+      const controlChoiceButtons = document.querySelectorAll(
+        ".control-choice-button"
+      );
+      const controlContainers = document.querySelectorAll(".control-container");
+
+      const openModal = () => {
+        settingsModal.classList.remove("pointer-events-none");
+        settingsModal.style.opacity = "1";
+        modalContent.style.transform = "scale(1)";
+      };
+
+      const closeModal = () => {
+        settingsModal.style.opacity = "0";
+        modalContent.style.transform = "scale(0.95)";
+        setTimeout(() => {
+          settingsModal.classList.add("pointer-events-none");
+        }, 300);
+      };
+
+      settingsButton.addEventListener("click", openModal);
+      closeModalButton.addEventListener("click", closeModal);
+      settingsModal.addEventListener("click", (event) => {
+        if (event.target === settingsModal) closeModal();
+      });
+
+      controlChoiceButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const selectedControl = button.dataset.control;
+          controlContainers.forEach((container) =>
+            container.classList.remove("active")
+          );
+          document
+            .getElementById(`${selectedControl}-control`)
+            .classList.add("active");
+
+          controlChoiceButtons.forEach((btn) => {
+            btn.classList.remove("bg-blue-500", "hover:bg-blue-600");
+            btn.classList.add("bg-gray-700", "hover:bg-gray-600");
+          });
+          button.classList.add("bg-blue-500", "hover:bg-blue-600");
+          button.classList.remove("bg-gray-700", "hover:bg-gray-600");
+
+          closeModal();
+        });
+      });
+
+      // --- LÓGICA DO JOYSTICK ---
+      const joystickContainer = document.getElementById("joystick-container");
+      const joystickStick = document.getElementById("joystick-stick");
+      const positionText = document.getElementById("position-text");
+      const directionText = document.getElementById("direction-text");
+      const strengthText = document.getElementById("strength-text");
+      let isJoystickDragging = false;
+      let jContainerRect, jCenterX, jCenterY, jMaxRadius;
+
+      function updateJoystickDimensions() {
+        jContainerRect = joystickContainer.getBoundingClientRect();
+        jCenterX = jContainerRect.left + jContainerRect.width / 2;
+        jCenterY = jContainerRect.top + jContainerRect.height / 2;
+        jMaxRadius = jContainerRect.width / 2 - joystickStick.offsetWidth / 2;
+      }
+      window.addEventListener("resize", updateJoystickDimensions);
+      new MutationObserver(() => {
+        if (joystickContainer.parentElement.classList.contains("active"))
+          updateJoystickDimensions();
+      }).observe(joystickContainer.parentElement, { attributes: true });
+
+      const startJoystickDrag = () => {
+        isJoystickDragging = true;
+        joystickStick.style.transition = "none";
+      };
+      const endJoystickDrag = () => {
+        if (!isJoystickDragging) return;
+        isJoystickDragging = false;
+        joystickStick.style.transition =
+          "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+        joystickStick.style.transform = "translate(0px, 0px)";
+        updateJoystickInfo(0, 0);
+      };
+      const joystickDrag = (event) => {
+        if (!isJoystickDragging) return;
+        event.preventDefault();
+        const clientX =
+          event.type === "touchmove" ? event.touches[0].clientX : event.clientX;
+        const clientY =
+          event.type === "touchmove" ? event.touches[0].clientY : event.clientY;
+        let deltaX = clientX - jCenterX;
+        let deltaY = clientY - jCenterY;
+        const distance = Math.hypot(deltaX, deltaY);
+        if (distance > jMaxRadius) {
+          const angle = Math.atan2(deltaY, deltaX);
+          deltaX = jMaxRadius * Math.cos(angle);
+          deltaY = jMaxRadius * Math.sin(angle);
+        }
+        joystickStick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        updateJoystickInfo(deltaX, deltaY);
+      };
+      const updateJoystickInfo = (x, y) => {
+        const normalizedX = Math.round((x / jMaxRadius) * 100);
+        const normalizedY = Math.round((y / jMaxRadius) * -100);
+        positionText.textContent = `(${normalizedX || 0}, ${normalizedY || 0})`;
+        strengthText.textContent = `${
+          Math.min(100, Math.round((Math.hypot(x, y) / jMaxRadius) * 100)) || 0
+        }%`;
+        let dir = "";
+        if (normalizedY > 20) dir += "Frente ";
+        if (normalizedY < -20) dir += "Trás ";
+        if (normalizedX < -20) dir += "Esquerda";
+        if (normalizedX > 20) dir += "Direita";
+        directionText.textContent = dir.trim() || "Parado";
+      };
+      joystickStick.addEventListener("mousedown", startJoystickDrag);
+      window.addEventListener("mousemove", joystickDrag);
+      window.addEventListener("mouseup", endJoystickDrag);
+      joystickStick.addEventListener("touchstart", startJoystickDrag, {
+        passive: true,
+      });
+      window.addEventListener("touchmove", joystickDrag, { passive: false });
+      window.addEventListener("touchend", endJoystickDrag);
+
+      // --- LÓGICA DOS BOTÕES ---
+      const buttonsDirectionText = document.getElementById(
+        "buttons-direction-text"
+      );
+      const dPadButtons = {
+        "btn-up": "FRENTE",
+        "btn-down": "TRÁS",
+        "btn-left": "ESQUERDA",
+        "btn-right": "DIREITA",
+      };
+      for (const [id, direction] of Object.entries(dPadButtons)) {
+        const button = document.getElementById(id);
+        const press = () => {
+          buttonsDirectionText.textContent = direction;
+        };
+        const release = () => {
+          buttonsDirectionText.textContent = "PARADO";
+        };
+        button.addEventListener("mousedown", press);
+        button.addEventListener("mouseup", release);
+        button.addEventListener("mouseleave", release);
+        button.addEventListener(
+          "touchstart",
+          (e) => {
+            e.preventDefault();
+            press();
+          },
+          { passive: false }
+        );
+        button.addEventListener("touchend", release);
+      }
+
+      // --- LÓGICA DO VOLANTE ---
+      const steeringWheelContainer = document.getElementById(
+        "steering-wheel-container"
+      );
+      const steeringWheelSvg = document.getElementById("steering-wheel-svg");
+      const acceleratorPedal = document.getElementById("accelerator-pedal");
+      const brakePedal = document.getElementById("brake-pedal");
+      const wheelAngleText = document.getElementById("wheel-angle-text");
+      const pedalStatusText = document.getElementById("pedal-status-text");
+
+      let isWheelDragging = false;
+      let wheelAngle = 0;
+
+      const updateWheelStatus = (angle, pedalStatus) => {
+        wheelAngleText.textContent = `${Math.round(angle)}°`;
+        pedalStatusText.textContent = pedalStatus;
+      };
+
+      const handleWheelDrag = (event) => {
+        if (!isWheelDragging) return;
+        event.preventDefault();
+        const wheelRect = steeringWheelContainer.getBoundingClientRect();
+        const wheelCenterX = wheelRect.left + wheelRect.width / 2;
+        const wheelCenterY = wheelRect.top + wheelRect.height / 2;
+        const clientX =
+          event.type === "touchmove" ? event.touches[0].clientX : event.clientX;
+        const clientY =
+          event.type === "touchmove" ? event.touches[0].clientY : event.clientY;
+        const angleRad = Math.atan2(
+          clientY - wheelCenterY,
+          clientX - wheelCenterX
+        );
+        wheelAngle = angleRad * (180 / Math.PI) + 90; // +90 para alinhar
+        steeringWheelSvg.style.transform = `rotate(${wheelAngle}deg)`;
+        updateWheelStatus(wheelAngle, pedalStatusText.textContent);
+      };
+
+      const startWheelDrag = (e) => {
+        isWheelDragging = true;
+        handleWheelDrag(e);
+      };
+      const endWheelDrag = () => {
+        isWheelDragging = false;
+      };
+
+      const handlePedalPress = (pedal, status) => {
+        pedal.classList.add("pressed");
+        updateWheelStatus(wheelAngle, status);
+      };
+      const handlePedalRelease = (pedal) => {
+        pedal.classList.remove("pressed");
+        updateWheelStatus(wheelAngle, "PARADO");
+      };
+
+      steeringWheelContainer.addEventListener("mousedown", startWheelDrag);
+      window.addEventListener("mousemove", handleWheelDrag);
+      window.addEventListener("mouseup", endWheelDrag);
+      steeringWheelContainer.addEventListener("touchstart", startWheelDrag, {
+        passive: false,
+      });
+      window.addEventListener("touchmove", handleWheelDrag, { passive: false });
+      window.addEventListener("touchend", endWheelDrag);
+
+      acceleratorPedal.addEventListener("mousedown", () =>
+        handlePedalPress(acceleratorPedal, "ACELERANDO")
+      );
+      acceleratorPedal.addEventListener("mouseup", () =>
+        handlePedalRelease(acceleratorPedal)
+      );
+      acceleratorPedal.addEventListener("mouseleave", () =>
+        handlePedalRelease(acceleratorPedal)
+      );
+      acceleratorPedal.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        handlePedalPress(acceleratorPedal, "ACELERANDO");
+      });
+      acceleratorPedal.addEventListener("touchend", () =>
+        handlePedalRelease(acceleratorPedal)
+      );
+
+      brakePedal.addEventListener("mousedown", () =>
+        handlePedalPress(brakePedal, "FREANDO")
+      );
+      brakePedal.addEventListener("mouseup", () =>
+        handlePedalRelease(brakePedal)
+      );
+      brakePedal.addEventListener("mouseleave", () =>
+        handlePedalRelease(brakePedal)
+      );
+      brakePedal.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        handlePedalPress(brakePedal, "FREANDO");
+      });
+      brakePedal.addEventListener("touchend", () =>
+        handlePedalRelease(brakePedal)
+      );
+    </script>
+  </body>
+</html>
