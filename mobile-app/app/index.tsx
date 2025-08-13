@@ -1,8 +1,6 @@
-// mobile-app/app/initialScreen/index.tsx
-
+// mobile-app/app/index.tsx
 import { StyleSheet, Button } from "react-native";
-import { Stack, useRouter } from "expo-router";
-
+import { useRouter } from "expo-router";
 import { Text, View } from "@/components/Themed";
 
 export default function InitialScreen() {
@@ -10,7 +8,6 @@ export default function InitialScreen() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: "Bem-vindo!" }} />
       <Text style={styles.title}>Bem-vindo ao meu projeto!</Text>
       <View
         style={styles.separator}
@@ -19,7 +16,7 @@ export default function InitialScreen() {
       />
       <Button
         title="Iniciar o Controle"
-        onPress={() => router.push("/ControllScreen")}
+        onPress={() => router.push("/controlScreen")}
       />
     </View>
   );
