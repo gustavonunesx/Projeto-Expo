@@ -1,22 +1,66 @@
-# Ignorar node_modules em mobile-app
+# Diretórios de dependências e build
+node_modules/
 mobile-app/node_modules/
+
+# Arquivos de lock
+package-lock.json
 mobile-app/package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# Outros arquivos/diretórios comuns em projetos Expo
+# Expo
+.expo/
 mobile-app/.expo/
-mobile-app/dist/
-mobile-app/build/
-mobile-app/assets/*.png.liquid
-mobile-app/*.log
-mobile-app/npm-debug.log
-mobile-app/yarn-error.log
-mobile-app/.DS_Store
+dist/
+web-build/
+expo-env.d.ts
 
-# Ignorar arquivos de configuração sensíveis (se houver)
+# Compilação e build
+build/
+web-build/
+mobile-app/build/
+mobile-app/web-build/
+mobile-app/dist/
+
+# Arquivos de log e cache
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.metro-health-check*
+*.tsbuildinfo
+.cache/
+__generated__/
+mobile-app/*.log
+mobile-app/.DS_Store
+mobile-app/__generated__/
+mobile-app/.cache/
+
+# Arquivos de ambiente local (informações sensíveis)
+.env
+.env.local
+.env.*.local
+.env*.local
 mobile-app/.env
 mobile-app/.env.local
 mobile-app/.env.*.local
+mobile-app/.env*.local
 
-# Ignorar arquivos de build e cache
-mobile-app/__generated__/
-mobile-app/.cache/
+# Arquivos nativos (iOS e Android)
+# Chaves e credenciais
+*.jks
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+.kotlin/
+*.orig.*
+
+# Imagens de assets temporários ou de build
+mobile-app/assets/*.png.liquid
+mobile-app/assets/images/adaptive-icon.png
+mobile-app/assets/images/favicon.png
+mobile-app/assets/images/icon.png
+mobile-app/assets/images/splash-icon.png
