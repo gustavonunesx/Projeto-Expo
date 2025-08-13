@@ -1,4 +1,3 @@
-// mobile-app/app/index.tsx
 import { StyleSheet, Button } from "react-native";
 import { useRouter } from "expo-router";
 import { Text, View } from "@/components/Themed";

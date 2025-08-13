@@ -1,7 +1,5 @@
-// mobile-app/app/_layout.tsx
 import { useFonts } from "expo-font";
-import { Slot, useRouter, useSegments } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
+import { Slot, SplashScreen } from "expo-router";
 import { useEffect } from "react";
 import {
   DarkTheme,
@@ -13,9 +11,8 @@ import { useColorScheme } from "@/components/useColorScheme";
 
 export { ErrorBoundary } from "expo-router";
 
-// Configuração explícita da rota inicial
 export const unstable_settings = {
-  initialRouteName: "index", // Agora apontando diretamente para o arquivo index
+  initialRouteName: "(tabs)",
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -43,15 +40,6 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    // Verificação adicional para garantir a rota inicial
-    if (segments.length === 0) {
-      router.replace("/index");
-    }
-  }, []);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
