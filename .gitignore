@@ -1,28 +1,26 @@
-# Diretórios de dependências e build
+# Arquivos de dependências e build
 node_modules/
 mobile-app/node_modules/
+.expo/
+mobile-app/.expo/
+dist/
+mobile-app/dist/
+web-build/
+mobile-app/web-build/
+build/
+mobile-app/build/
 
-# Arquivos de lock
+# Arquivos de lock de pacotes
 package-lock.json
 mobile-app/package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
 # Expo
-.expo/
-mobile-app/.expo/
-dist/
-web-build/
 expo-env.d.ts
+mobile-app/expo-env.d.ts
 
-# Compilação e build
-build/
-web-build/
-mobile-app/build/
-mobile-app/web-build/
-mobile-app/dist/
-
-# Arquivos de log e cache
+# Logs e cache
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -48,7 +46,6 @@ mobile-app/.env.*.local
 mobile-app/.env*.local
 
 # Arquivos nativos (iOS e Android)
-# Chaves e credenciais
 *.jks
 *.p8
 *.p12
@@ -58,9 +55,5 @@ mobile-app/.env*.local
 .kotlin/
 *.orig.*
 
-# Imagens de assets temporários ou de build
-mobile-app/assets/*.png.liquid
-mobile-app/assets/images/adaptive-icon.png
-mobile-app/assets/images/favicon.png
-mobile-app/assets/images/icon.png
-mobile-app/assets/images/splash-icon.png
+# Ignorar o .gitignore gerado automaticamente pelo Expo
+mobile-app/.gitignore

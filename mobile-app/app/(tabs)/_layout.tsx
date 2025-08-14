@@ -1,20 +1,27 @@
-import { Stack } from "expo-router";
+import { Tabs } from "expo-router/tabs";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function AppLayout() {
   return (
-    <Stack>
-      <Stack.Screen
+    <Tabs>
+      <Tabs.Screen
         name="index"
         options={{
           title: "Início",
+          tabBarIcon: ({ color }: { color: string }) => (
+            <FontAwesome size={28} name="home" color={color} />
+          ),
         }}
       />
-      <Stack.Screen
+      <Tabs.Screen
         name="controlScreen"
         options={{
           title: "Controles",
+          tabBarIcon: ({ color }: { color: string }) => (
+            <FontAwesome size={28} name="gamepad" color={color} />
+          ),
         }}
       />
-    </Stack>
+    </Tabs>
   );
 }
