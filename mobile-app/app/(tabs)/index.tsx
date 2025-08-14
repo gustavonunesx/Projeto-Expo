@@ -1,24 +1,52 @@
-import { TouchableOpacity, View, Text } from "react-native";
+import React, { useRef } from "react";
+import { Animated, View, Text, TouchableWithoutFeedback } from "react-native";
 import { useRouter } from "expo-router";
-import { FontAwesome5 } from "@expo/vector-icons"; // ← Aqui muda
+import { FontAwesome5 } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import styles from "../../assets/Styles/index";
 
 export default function InitialScreen() {
   const router = useRouter();
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const onPressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const onPressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
 
   return (
     <View style={styles.container}>
-      <View>
-        <FontAwesome5 size={28} name="car-battery" /> {/* ← Agora funciona */}
-      </View>
+      <FontAwesome5 size={45} name="car-battery" style={styles.iconeInit} />
 
       <Text style={styles.title}>Bem-vindo!</Text>
-
       <Text style={styles.subTitle}>Pronto para assumir o controle?</Text>
 
-      <TouchableOpacity style={styles.btnInit}>
-        <Text>Iniciar</Text>
-      </TouchableOpacity>
+      <TouchableWithoutFeedback
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        onPress={() => router.push("/controlScreen")}
+      >
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <LinearGradient
+            colors={["#00B4DB", "#8A2BE2"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.btnGradient}
+          >
+            <Text style={styles.btnText}>Iniciar</Text>
+          </LinearGradient>
+        </Animated.View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
