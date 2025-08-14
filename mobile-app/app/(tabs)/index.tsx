@@ -1,9 +1,5 @@
-import React, { useRef } from "react";
-import { Animated, View, Text, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, Button, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import styles from "../../assets/Styles/index";
 
 export default function InitialScreen() {
   const router = useRouter();
