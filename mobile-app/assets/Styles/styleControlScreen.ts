@@ -1,12 +1,15 @@
 import { StyleSheet, Dimensions } from "react-native";
+import { blue } from "react-native-reanimated/lib/typescript/Colors";
+import { LinearGradient } from "expo-linear-gradient";
 
 const { width, height } = Dimensions.get('window');
 
-export default StyleSheet.create({
+export default StyleSheet.create({  
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#0A192F',
         paddingTop: height * 0.05, // 5% da altura da tela
     },
     settings: {
@@ -72,5 +75,9 @@ export default StyleSheet.create({
     },
     optionText: {
         fontSize: width * 0.04, // 4% da largura
+    },
+
+    titleGradient:{
+
     }
 });

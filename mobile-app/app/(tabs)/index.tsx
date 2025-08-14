@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from "react";
 import { Animated, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
