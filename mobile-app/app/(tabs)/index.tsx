@@ -1,6 +1,5 @@
-import { StyleSheet, Button } from "react-native";
+import { StyleSheet, Button, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { Text, View } from "@/components/Themed";
 
 export default function InitialScreen() {
   const router = useRouter();
