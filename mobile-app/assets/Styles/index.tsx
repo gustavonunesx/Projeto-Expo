@@ -1,13 +1,6 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0A192F",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
   title: {
     fontSize: 28,
     fontWeight: "bold",
@@ -26,11 +19,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
     elevation: 5,
+    boxShadow: "0px 4px 5px rgba(0,0,0,0.3)", // compatível web
   },
   btnText: {
     color: "#FFFFFF",
@@ -40,7 +30,7 @@ const styles = StyleSheet.create({
   },
   iconeInit: {
     color: "#00B4DB",
-    textShadowColor: "rgba(0, 0, 0, 0.4)",
+    textShadowColor: "rgba(0,0,0,0.4)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
