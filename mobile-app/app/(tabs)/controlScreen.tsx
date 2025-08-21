@@ -1,58 +1,43 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  Animated,
-  Easing,
-  TouchableWithoutFeedback,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import styles from "@/assets/Styles/styleControlScreen";
-import AnalogJoystick from "@/components/controls/AnalogJoystick"; // Importando o joystick refatorado
+import AnalogJoystick from "@/components/controls/AnalogJoystick";
+import Dpad from "@/components/controls/DirectionalPad";
+import SteeringWheel from "@/components/controls/SteeringWheel";
 
-type JoystickType = "analogico" | "volante" | "setas";
-
-interface JoystickState {
-  x: number;
-  y: number;
-  force: number;
-  direction: string;
-}
-
-// Componente placeholder para outros tipos de controle
-const PlaceholderControl = ({ type }: { type: JoystickType }) => (
-  <View style={styles.joystickPlaceholder}>
-    <Text style={{ color: "white", fontSize: styles.optionText.fontSize }}>
-      {type === "volante" ? "Volante e Pedais" : "Controle por Setas"}
-    </Text>
-  </View>
-);
+type JoystickType = "analogico" | "setas" | "volante";
 
 export default function ControlScreen() {
-  const [showOptions, setShowOptions] = useState(false);
   const [selectedJoystick, setSelectedJoystick] =
     useState<JoystickType>("analogico");
-  const [joystickData, setJoystickData] = useState<JoystickState>({
+  const [joystickData, setJoystickData] = useState({
     x: 0,
     y: 0,
     force: 0,
     direction: "PARADO",
   });
-
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [dpadDirection, setDpadDirection] = useState<string>("PARADO");
+  const [wheelData, setWheelData] = useState({
+    angle: 0,
+    pedalStatus: "PARADO",
+  });
 
   const handleJoystickMove = useCallback(
     ({ x, y }: { x: number; y: number }) => {
-      const MAX_RAW_DISTANCE = 100; // Raio máximo de movimento do joystick
+      const MAX_RAW_DISTANCE = 100;
       const scaledX = Math.round((x / MAX_RAW_DISTANCE) * 100);
       const scaledY = Math.round((y / MAX_RAW_DISTANCE) * 100);
-
       const distance = Math.sqrt(x * x + y * y);
-      const force = Math.round((distance / MAX_RAW_DISTANCE) * 100);
+      const force = Math.min(
+        100,
+        Math.round((distance / MAX_RAW_DISTANCE) * 100)
+      );
 
       let direction = "PARADO";
       if (force > 10) {
@@ -62,135 +47,169 @@ export default function ControlScreen() {
           direction = scaledY > 0 ? "FRENTE" : "TRÁS";
         }
       }
-
-      setJoystickData({
-        x: scaledX,
-        y: scaledY,
-        force: Math.min(force, 100),
-        direction: direction,
-      });
+      setJoystickData({ x: scaledX, y: scaledY, force, direction });
     },
     []
   );
 
-  const toggleSettings = () => {
-    const toValue = showOptions ? 0 : 1;
-    setShowOptions(!showOptions); // Toggle state immediately for conditional rendering
-
-    Animated.parallel([
-      Animated.timing(rotateAnim, {
-        toValue,
-        duration: 400,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue,
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const selectJoystick = (type: JoystickType) => {
-    setSelectedJoystick(type);
-    toggleSettings();
-  };
-
-  const rotateInterpolation = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "180deg"],
-  });
-
   const renderControl = () => {
-    if (selectedJoystick === "analogico") {
-      return <AnalogJoystick onMove={handleJoystickMove} />;
+    switch (selectedJoystick) {
+      case "analogico":
+        return <AnalogJoystick onMove={handleJoystickMove} />;
+      case "setas":
+        return <Dpad onDirectionChange={setDpadDirection} />;
+      case "volante":
+        return (
+          <SteeringWheel
+            onAngleChange={(angle) =>
+              setWheelData((prev) => ({ ...prev, angle }))
+            }
+            onPedalChange={(pedalStatus) =>
+              setWheelData((prev) => ({ ...prev, pedalStatus }))
+            }
+          />
+        );
+      default:
+        return null;
     }
-    return <PlaceholderControl type={selectedJoystick} />;
+  };
+
+  const renderDataBox = () => {
+    switch (selectedJoystick) {
+      case "analogico":
+        return (
+          <>
+            <View style={styles.dataRow}>
+              <Text style={styles.dataLabel}>EIXO X / Y</Text>
+              <Text style={styles.dataValue}>
+                ({joystickData.x}, {joystickData.y})
+              </Text>
+            </View>
+            <View style={styles.dataRow}>
+              <Text style={styles.dataLabel}>FORÇA</Text>
+              <Text style={styles.dataValue}>{joystickData.force}%</Text>
+            </View>
+            <View style={styles.dataRow}>
+              <Text style={styles.dataLabel}>DIREÇÃO</Text>
+              <Text style={styles.dataValue}>{joystickData.direction}</Text>
+            </View>
+          </>
+        );
+      case "setas":
+        return (
+          <View style={styles.dataRow}>
+            <Text style={styles.dataLabel}>DIREÇÃO</Text>
+            <Text style={styles.dataValue}>{dpadDirection}</Text>
+          </View>
+        );
+      case "volante":
+        return (
+          <>
+            <View style={styles.dataRow}>
+              <Text style={styles.dataLabel}>ÂNGULO</Text>
+              <Text style={styles.dataValue}>
+                {Math.round(wheelData.angle)}°
+              </Text>
+            </View>
+            <View style={styles.dataRow}>
+              <Text style={styles.dataLabel}>PEDAIS</Text>
+              <Text style={styles.dataValue}>{wheelData.pedalStatus}</Text>
+            </View>
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.settings}
-        onPress={toggleSettings}
-        activeOpacity={0.7}
-      >
-        <Animated.View style={{ transform: [{ rotate: rotateInterpolation }] }}>
-          <FontAwesome
-            size={styles.title.fontSize! * 0.8}
-            name="cog"
-            color="#FFF"
-          />
-        </Animated.View>
-      </TouchableOpacity>
-
       <Text style={styles.title}>Painel de Controle</Text>
-      <Text style={styles.subtitle}>Selecione e utilize o controle.</Text>
-
-      <View style={styles.joystickContainer}>{renderControl()}</View>
-
-      <View style={styles.dataBox}>
-        <View style={styles.dataRow}>
-          <Text style={styles.dataLabel}>EIXO X / Y</Text>
-          <Text style={styles.dataValue}>
-            ({joystickData.x}, {joystickData.y})
-          </Text>
-        </View>
-        <View style={styles.dataRow}>
-          <Text style={styles.dataLabel}>FORÇA</Text>
-          <Text style={styles.dataValue}>{joystickData.force}%</Text>
-        </View>
-        <View style={styles.dataRow}>
-          <Text style={styles.dataLabel}>DIREÇÃO</Text>
-          <Text style={styles.dataValue}>{joystickData.direction}</Text>
-        </View>
-      </View>
-
-      {showOptions && (
-        <TouchableWithoutFeedback onPress={toggleSettings}>
-          <Animated.View
-            style={[styles.modalBackground, { opacity: opacityAnim }]}
+      <View style={styles.optionsContainer}>
+        {(["analogico", "setas", "volante"] as JoystickType[]).map((type) => (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.optionButton,
+              selectedJoystick === type && styles.optionButtonSelected,
+            ]}
+            onPress={() => setSelectedJoystick(type)}
           >
-            <TouchableWithoutFeedback>
-              <Animated.View
-                style={[
-                  styles.modalContent,
-                  { transform: [{ scale: scaleAnim }], opacity: opacityAnim },
-                ]}
-              >
-                <Text style={styles.modalTitle}>
-                  Selecione o tipo de controle
-                </Text>
-
-                {(["analogico", "volante", "setas"] as JoystickType[]).map(
-                  (type) => (
-                    <TouchableOpacity
-                      key={type}
-                      style={styles.optionButton}
-                      onPress={() => selectJoystick(type)}
-                    >
-                      <Text style={styles.optionText}>
-                        {type === "analogico"
-                          ? "Analógico"
-                          : type === "volante"
-                          ? "Volante"
-                          : "Setas"}
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                )}
-              </Animated.View>
-            </TouchableWithoutFeedback>
-          </Animated.View>
-        </TouchableWithoutFeedback>
-      )}
+            <Text style={styles.optionText}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <View style={styles.joystickContainer}>{renderControl()}</View>
+      <View style={styles.dataBox}>{renderDataBox()}</View>
     </View>
   );
 }
+
+const { width, height } = Dimensions.get("window");
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0A192F",
+    paddingTop: height * 0.05,
+    gap: 20,
+  },
+  title: {
+    fontSize: width * 0.07,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#FFFFFF",
+  },
+  optionsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+    marginBottom: 20,
+  },
+  optionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: "#272a33",
+    borderRadius: 20,
+  },
+  optionButtonSelected: {
+    backgroundColor: "#61a3f2",
+  },
+  optionText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  joystickContainer: {
+    width: "90%",
+    aspectRatio: 1,
+    maxWidth: 400,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dataBox: {
+    backgroundColor: "#272a33",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    maxWidth: 350,
+  },
+  dataRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  dataLabel: {
+    fontSize: 16,
+    color: "#a0a0a0",
+  },
+  dataValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+});
