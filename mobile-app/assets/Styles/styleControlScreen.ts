@@ -1,83 +1,99 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { blue } from "react-native-reanimated/lib/typescript/Colors";
-import { LinearGradient } from "expo-linear-gradient";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
-export default StyleSheet.create({  
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#0A192F',
-        paddingTop: height * 0.05, // 5% da altura da tela
-    },
-    settings: {
-        position: 'absolute',
-        top: height * 0.05, // 5% da altura
-        right: width * 0.05, // 5% da largura
-        zIndex: 1
-    },
-    title: {
-        fontSize: width * 0.06, // 6% da largura
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: height * 0.02 // 2% da altura
-    },
-    subtitle: {
-        fontSize: width * 0.04, // 4% da largura
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: height * 0.05 // 5% da altura
-    },
-    joystickContainer: {
-        width: '90%',
-        aspectRatio: 1, // Mantém relação quadrada
-        maxWidth: 400, // Limite máximo
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: height * 0.05
-    },
-    joystickPlaceholder: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#eee',
-        borderRadius: width * 0.1, // 10% da largura
-    },
-    modalBackground: {
-        ...StyleSheet.absoluteFillObject, // Preenche toda a tela
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-        width: width * 0.8, // 80% da largura
-        maxWidth: 350, // Limite máximo
-        backgroundColor: 'white',
-        borderRadius: width * 0.05, // 5% da largura
-        padding: width * 0.05, // 5% da largura
-    },
-    modalTitle: {
-        fontSize: width * 0.05, // 5% da largura
-        fontWeight: 'bold',
-        marginBottom: height * 0.03, // 3% da altura
-        textAlign: 'center'
-    },
-    optionButton: {
-        width: '100%',
-        paddingVertical: height * 0.02, // 2% da altura
-        marginVertical: height * 0.01, // 1% da altura
-        backgroundColor: '#f0f0f0',
-        borderRadius: width * 0.02, // 2% da largura
-        alignItems: 'center',
-    },
-    optionText: {
-        fontSize: width * 0.04, // 4% da largura
-    },
-
-    titleGradient:{
-
-    }
+export default StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0A192F",
+    paddingTop: height * 0.05,
+    gap: 20,
+  },
+  settings: {
+    position: "absolute",
+    top: height * 0.05,
+    right: width * 0.05,
+    zIndex: 1,
+  },
+  title: {
+    fontSize: width * 0.07,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#FFFFFF",
+  },
+  subtitle: {
+    fontSize: width * 0.04,
+    color: "#666",
+    textAlign: "center",
+    marginBottom: height * 0.02,
+  },
+  joystickContainer: {
+    width: "90%",
+    aspectRatio: 1,
+    maxWidth: 400,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  joystickPlaceholder: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#333642",
+    borderRadius: (width * 0.9) / 2,
+  },
+  dataBox: {
+    backgroundColor: "#272a33",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    maxWidth: 350,
+  },
+  dataRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  dataLabel: {
+    fontSize: 16,
+    color: "#a0a0a0",
+  },
+  dataValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  modalBackground: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: width * 0.8,
+    maxWidth: 350,
+    backgroundColor: "white",
+    borderRadius: width * 0.05,
+    padding: width * 0.05,
+  },
+  modalTitle: {
+    fontSize: width * 0.05,
+    fontWeight: "bold",
+    marginBottom: height * 0.03,
+    textAlign: "center",
+  },
+  optionButton: {
+    width: "100%",
+    paddingVertical: height * 0.02,
+    marginVertical: height * 0.01,
+    backgroundColor: "#f0f0f0",
+    borderRadius: width * 0.02,
+    alignItems: "center",
+  },
+  optionText: {
+    fontSize: width * 0.04,
+  },
 });
