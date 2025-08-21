@@ -35,7 +35,7 @@ export default function Dpad({ onDirectionChange }: DpadProps) {
   return (
     <View style={styles.wrapper}>
       <Text style={[styles.title, { fontSize: titleSize }]}>
-        Painel Controle
+        
       </Text>
 
       <View
