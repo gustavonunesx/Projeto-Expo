@@ -23,55 +23,83 @@ export default function Dpad({ onDirectionChange }: DpadProps) {
     onDirectionChange("PARADO");
   };
 
+  const { width } = Dimensions.get("window");
+  const isMobile = width < 768; // breakpoint simples
+
+  //tamahho do container das setas(redor)
+  const containerSize = isMobile ? width * 0.5 : width * 0.25;
+  const buttonSize = isMobile ? 70 : 100;
+  const iconSize = isMobile ? 20 : 28;
+  const titleSize = isMobile ? 24 : 48;
+
   return (
-    <View style={styles.dpadContainer}>
-      <TouchableOpacity
-        style={[styles.dpadButton, styles.up]}
-        onPressIn={() => handlePressIn("FRENTE")}
-        onPressOut={handlePressOut}
+    <View style={styles.wrapper}>
+      <Text style={[styles.title, { fontSize: titleSize }]}>
+        Painel Controle
+      </Text>
+
+      <View
+        style={[
+          styles.dpadContainer,
+          { width: containerSize, height: containerSize },
+        ]}
       >
-        <FontAwesome name="arrow-up" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.dpadButton, styles.left]}
-        onPressIn={() => handlePressIn("ESQUERDA")}
-        onPressOut={handlePressOut}
-      >
-        <FontAwesome name="arrow-left" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.dpadButton, styles.right]}
-        onPressIn={() => handlePressIn("DIREITA")}
-        onPressOut={handlePressOut}
-      >
-        <FontAwesome name="arrow-right" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.dpadButton, styles.down]}
-        onPressIn={() => handlePressIn("TRÁS")}
-        onPressOut={handlePressOut}
-      >
-        <FontAwesome name="arrow-down" size={24} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.dpadButton, styles.up, { width:buttonSize, height: buttonSize }]}
+          onPressIn={() => handlePressIn("FRENTE")}
+          onPressOut={handlePressOut}
+        >
+          <FontAwesome name="arrow-up" size={iconSize} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.dpadButton, styles.left, { width: buttonSize, height: buttonSize }]}
+          onPressIn={() => handlePressIn("ESQUERDA")}
+          onPressOut={handlePressOut}
+        >
+          <FontAwesome name="arrow-left" size={iconSize} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.dpadButton, styles.right, { width: buttonSize, height: buttonSize }]}
+          onPressIn={() => handlePressIn("DIREITA")}
+          onPressOut={handlePressOut}
+        >
+          <FontAwesome name="arrow-right" size={iconSize} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.dpadButton, styles.down, { width: buttonSize, height: buttonSize }]}
+          onPressIn={() => handlePressIn("TRÁS")}
+          onPressOut={handlePressOut}
+        >
+          <FontAwesome name="arrow-down" size={iconSize} color="white" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
-const { width } = Dimensions.get("window");
-const containerSize = width * 0.6;
-
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#0d1726", // fundo escuro
+  },
+  title: {
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+    color: "white",
+  },
   dpadContainer: {
-    width: containerSize,
-    height: containerSize,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
   },
   dpadButton: {
     position: "absolute",
-    width: containerSize / 3,
-    height: containerSize / 3,
     backgroundColor: "#333642",
     justifyContent: "center",
     alignItems: "center",
